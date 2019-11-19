@@ -1,0 +1,72 @@
+Speeding things up notes
+
+- Motivating examples
+- lots of stuff
+- slow problems -- models that just take a long time
+
+Hardware
+- node-- motherboard with sockets
+- socket is a silicone chip with cores
+- cores, where computations occur
+- pseudo cores only appear to OS as independent cores (aka threads??)
+- cluster - over a network or on a single machine, as groups of cores
+
+- physical cpus (e.g., 6)
+- x 2 cores
+- total number for computation (2x6 = 12)
+- theoretically could run 12 at a time, but need to run other things
+- processes vs threads
+- process: single instance of R, could have multiple threads with execution
+- processes can't look into another process memory (e.g., different R sessions)
+
+?? Does each R session run on a different core??
+
+- cost to time it takes to split and do an analysis
+
+- sockets vs. forking, multicore won't work on windows
+- multicore and snow for lower level stuff
+	- uses forking, like on git
+	- creates a new process by copying the original
+	- doesn't take as much memory (whole version of R) (really??)
+	- memory isn't shared
+	- more efficient cpu usage
+	- fork and rejoin means more overhead
+- snow uses spawning (socket)
+	- new R process on each core
+	- can be done remotely via networking
+	- works on all OS
+	
+- parallel used by Jon more
+- 3 packages: foreach, parallel, and doParallel
+- based on for loops
+- foreach wihtout parallel replaces for loops, returns a list of results
+- recomended to not use all cores
+- RAM is bottleneck on allocating all cores
+- only helps with processing bounds, not with memory or "os bounds"
+	- things slowing down, memory issue
+	- engine sounds = processing issue
+- GPUs faster for some big machine learning stuff, but hard (good for matrix computations)
+- need to stopClusters at the end
+	- shuts down each of the additional processes (R sessions)
+
+- really long iterations can create objects that take up a lot of memory
+- one option is to use the iterators project, can iterate through without creating an obj of that size
+- or can make an implicit iterator
+- can also make it do as a chunk
+- there is a package in r to write to temp directory
+
+- don't actually save anything to workspace
+	- save every iteration as an .RDS file
+	- then, separately, loop through files and add them to data.frame
+	- use safely to get each one so if something bad happened you find out
+- writing to a file is a looooottttt slower than writing to RAM
+	- speed up code by not writing to file
+- parallelize reading in a huge spatial data frame
+
+
+- note RStudio and forking can have some odd behaviors
+
+Run R Script from terminal
+- can use terminal from RStudio
+- same as opening a terminal outside of it
+- will have to add Rscript to the path
